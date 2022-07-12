@@ -1,6 +1,7 @@
 package com.belleza.tiendadecosmeticos.controlador;
 
-import com.belleza.tiendadecosmeticos.dto.ProductoDto;
+import com.belleza.tiendadecosmeticos.dto.ProductoRequestDTO;
+import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.servicio.Impl.ProductoServicioImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,27 +19,27 @@ public class ProductoControlador {
     private ProductoServicioImpl productoServicio;
 
     @GetMapping
-    public ResponseEntity<List<Producto>> listarProductos(){
+    public ResponseEntity<List<Producto>> listarProductos() {
         return productoServicio.listarProductos();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id){
+    public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
         return productoServicio.productoPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<ProductoDto> guardarProductos(@RequestBody ProductoDto productoDto){
-        return productoServicio.guardarProducto(productoDto);
+    public ResponseEntity<ProductoRequestDTO> guardarProductos(@RequestBody ProductoRequestDTO productoRequestDto) {
+        return productoServicio.guardarProducto(productoRequestDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@RequestBody Producto producto, @PathVariable Long id){
-        return productoServicio.actualizarProducto(producto,id);
+    public ResponseEntity<ProductoResponseDTO> actualizarProducto(@RequestBody ProductoRequestDTO productoRequestDto, @PathVariable Long id) {
+        return ResponseEntity.ok().body(productoServicio.actualizarProducto(productoRequestDto, id));
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarProductos(@PathVariable Long id){
+    public void eliminarProductos(@PathVariable Long id) {
         productoServicio.eliminarProducto(id);
     }
 

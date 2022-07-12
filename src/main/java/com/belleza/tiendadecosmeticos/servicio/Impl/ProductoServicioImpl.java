@@ -1,13 +1,13 @@
 package com.belleza.tiendadecosmeticos.servicio.Impl;
 
-import com.belleza.tiendadecosmeticos.dto.ProductoDto;
+import com.belleza.tiendadecosmeticos.dto.ProductoRequestDTO;
+import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.modelo.ProductosCategorias;
 import com.belleza.tiendadecosmeticos.repositorio.ProductosCategoriasRepositorio;
 import com.belleza.tiendadecosmeticos.repositorio.ProductosRepositorio;
 import com.belleza.tiendadecosmeticos.servicio.ProductoServicio;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,39 +26,39 @@ public class ProductoServicioImpl implements ProductoServicio {
     public ResponseEntity<List<Producto>> listarProductos() {
         try {
             List<Producto> productos = productosRepositorio.findAll();
-            if (productos.isEmpty()){
+            if (productos.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(productos);
-        }catch (Exception e){
-            System.out.println("ERROR"+e);
+        } catch (Exception e) {
+            System.out.println("ERROR" + e);
         }
 
         return null;
     }
 
     @Override
-    public ResponseEntity<ProductoDto> guardarProducto(ProductoDto productoDto) {
+    public ResponseEntity<ProductoRequestDTO> guardarProducto(ProductoRequestDTO productoRequestDto) {
         try {
-            if (productoDto != null){
+            if (productoRequestDto != null) {
                 Producto producto = new Producto();
-                producto.setNombre(productoDto.getNombre());
-                producto.setPrecio(productoDto.getPrecio());
-                producto.setCantidad(productoDto.getCantidad());
-                producto.setColor(productoDto.getColor());
+                producto.setNombre(productoRequestDto.getNombre());
+                producto.setPrecio(productoRequestDto.getPrecio());
+                producto.setCantidad(productoRequestDto.getCantidad());
+                producto.setColor(productoRequestDto.getColor());
                 Producto nuevoProducto = productosRepositorio.save(producto);
 
                 ProductosCategorias productosCategorias = new ProductosCategorias();
-                productosCategorias.setCategoria_id(productoDto.getCategoriaId());
+                productosCategorias.setCategoria_id(productoRequestDto.getCategoriaId());
                 productosCategorias.setProducto_id(producto.getId());
                 ProductosCategorias nuevaRelacion = productosCategoriasRepositorio.save(productosCategorias);
 
-                return ResponseEntity.ok(productoDto);
+                return ResponseEntity.ok(productoRequestDto);
 
-            }else {
+            } else {
                 return ResponseEntity.notFound().build();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -71,7 +71,7 @@ public class ProductoServicioImpl implements ProductoServicio {
         try {
             productosCategoriasRepositorio.deleteById(id);
             productosRepositorio.deleteById(id);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -82,11 +82,11 @@ public class ProductoServicioImpl implements ProductoServicio {
     public ResponseEntity<Producto> productoPorId(Long id) {
         try {
             Producto producto = productosRepositorio.findById(id).orElse(null);
-            if (producto == null){
+            if (producto == null) {
                 return ResponseEntity.notFound().build();
             }
             return ResponseEntity.ok(producto);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -94,18 +94,24 @@ public class ProductoServicioImpl implements ProductoServicio {
     }
 
     @Override
-    public ResponseEntity<Producto> actualizarProducto(Producto producto, Long id) {
+    public ProductoResponseDTO actualizarProducto(ProductoRequestDTO productoRequestDto, Long id) {
         try {
             Producto productoActual = productosRepositorio.findById(id).orElseThrow();
             productoActual.setId(id);
-            productoActual.setNombre(producto.getNombre());
-            productoActual.setPrecio(producto.getPrecio());
-            productoActual.setCantidad(producto.getCantidad());
-            productoActual.setColor(producto.getColor());
+            productoActual.setNombre(productoRequestDto.getNombre());
+            productoActual.setPrecio(productoRequestDto.getPrecio());
+            productoActual.setCantidad(productoRequestDto.getCantidad());
+            productoActual.setColor(productoRequestDto.getColor());
             productosRepositorio.save(productoActual);
-            return  new ResponseEntity<Producto>(HttpStatus.OK);
-        }catch (Exception exception){
-            return new ResponseEntity<Producto>(HttpStatus.NOT_FOUND);
+            return new ProductoResponseDTO(productoActual.getNombre(),
+                    productoActual.getPrecio(),
+                    productoActual.getCantidad(),
+                    productoActual.getColor());
+
+        } catch (Exception exception) {
+            throw exception;
+            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+            //return new ResponseEntity<Producto>(HttpStatus.NOT_FOUND);
         }
     }
 }
