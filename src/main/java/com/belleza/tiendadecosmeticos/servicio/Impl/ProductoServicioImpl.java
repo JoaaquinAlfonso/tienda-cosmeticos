@@ -97,11 +97,12 @@ public class ProductoServicioImpl implements ProductoServicio {
     public ResponseEntity<Producto> actualizarProducto(Producto producto, Long id) {
         try {
             Producto productoActual = productosRepositorio.findById(id).orElseThrow();
+            productoActual.setId(id);
             productoActual.setNombre(producto.getNombre());
             productoActual.setPrecio(producto.getPrecio());
             productoActual.setCantidad(producto.getCantidad());
             productoActual.setColor(producto.getColor());
-            productosRepositorio.save(producto);
+            productosRepositorio.save(productoActual);
             return  new ResponseEntity<Producto>(HttpStatus.OK);
         }catch (Exception exception){
             return new ResponseEntity<Producto>(HttpStatus.NOT_FOUND);
