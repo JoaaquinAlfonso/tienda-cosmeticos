@@ -1,5 +1,6 @@
 package com.belleza.tiendadecosmeticos.servicio;
 
+import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
@@ -14,7 +15,7 @@ public interface CategoriaServicio {
      */
     List<CategoriaResponseDTO> listarCategorias();
 
-    CategoriaResponseDTO guardarCategorias(Categoria categoria);
+    CategoriaResponseDTO guardarCategorias(CategoriaRequestDTO categoriaRequestDTO);
 
     ResponseEntity<Categoria> eliminarCategoria(Long id);
 

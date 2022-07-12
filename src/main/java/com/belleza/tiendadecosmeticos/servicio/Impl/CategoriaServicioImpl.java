@@ -1,5 +1,6 @@
 package com.belleza.tiendadecosmeticos.servicio.Impl;
 
+import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
@@ -7,12 +8,10 @@ import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.repositorio.CategoriaRepositorio;
 import com.belleza.tiendadecosmeticos.servicio.CategoriaServicio;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -51,9 +50,13 @@ public class CategoriaServicioImpl implements CategoriaServicio {
     }
 
     @Override
-    public CategoriaResponseDTO guardarCategorias(Categoria categoria) {
+    public CategoriaResponseDTO guardarCategorias(CategoriaRequestDTO categoriaRequestDTO) {
         try {
-            Categoria nuevaCategoria = categoriaRepositorio.save(categoria);
+            Categoria categoriaPorCrear = new Categoria();
+            categoriaPorCrear.setNombre(categoriaRequestDTO.getNombre());
+
+            Categoria nuevaCategoria = categoriaRepositorio.save(categoriaPorCrear);
+
             if (nuevaCategoria == null) {
                 //TODO Agregar lanzamiento de excepción personalizada.
                 //return ResponseEntity.notFound().build();

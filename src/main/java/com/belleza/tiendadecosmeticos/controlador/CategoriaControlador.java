@@ -1,5 +1,6 @@
 package com.belleza.tiendadecosmeticos.controlador;
 
+import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
@@ -24,8 +25,8 @@ public class CategoriaControlador {
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaResponseDTO> guardarCategoria(@RequestBody Categoria categoria) {
-        return ResponseEntity.ok().body(categoriaServicio.guardarCategorias(categoria));
+    public ResponseEntity<CategoriaResponseDTO> guardarCategoria(@RequestBody CategoriaRequestDTO categoriaRequestDTO) {
+        return ResponseEntity.ok().body(categoriaServicio.guardarCategorias(categoriaRequestDTO));
     }
 
     @DeleteMapping("/{id}")
