@@ -1,5 +1,6 @@
 package com.belleza.tiendadecosmeticos.controlador;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.servicio.Impl.ProductoServicioImpl;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -38,8 +40,8 @@ public class ProductoControlador {
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarProductos(@PathVariable Long id) {
-        productoServicio.eliminarProducto(id);
+    public ResponseEntity<ResponseInfoDTO> eliminarProductos(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        return ResponseEntity.ok().body(productoServicio.eliminarProducto(id, httpServletRequest));
     }
 
 }

@@ -1,11 +1,13 @@
 package com.belleza.tiendadecosmeticos.servicio;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface CategoriaServicio {
@@ -17,7 +19,7 @@ public interface CategoriaServicio {
 
     CategoriaResponseDTO guardarCategorias(CategoriaRequestDTO categoriaRequestDTO);
 
-    ResponseEntity<Categoria> eliminarCategoria(Long id);
+    ResponseInfoDTO eliminarCategoria(Long id, HttpServletRequest httpServletRequest);
 
     List<ProductoResponseDTO> listarProductoPorCategoria(Long id);
 

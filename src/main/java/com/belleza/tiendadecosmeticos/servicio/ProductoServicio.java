@@ -1,10 +1,12 @@
 package com.belleza.tiendadecosmeticos.servicio;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface ProductoServicio {
@@ -12,7 +14,7 @@ public interface ProductoServicio {
 
     ProductoResponseDTO guardarProducto(ProductoRequestDTO productoRequestDto);
 
-    ResponseEntity<Producto> eliminarProducto(Long id);
+    ResponseInfoDTO eliminarProducto(Long id, HttpServletRequest httpServletRequest);
 
     ProductoResponseDTO productoPorId(Long id);
 

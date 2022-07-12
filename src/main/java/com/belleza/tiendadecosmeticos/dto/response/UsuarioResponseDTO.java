@@ -11,6 +11,8 @@ import lombok.Setter;
 @Setter
 public class UsuarioResponseDTO {
 
+    private Long id;
+
     private String nombre;
 
     private int cedula;

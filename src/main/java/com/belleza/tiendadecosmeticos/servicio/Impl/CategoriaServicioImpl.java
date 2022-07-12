@@ -1,5 +1,6 @@
 package com.belleza.tiendadecosmeticos.servicio.Impl;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
@@ -8,9 +9,10 @@ import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.repositorio.CategoriaRepositorio;
 import com.belleza.tiendadecosmeticos.servicio.CategoriaServicio;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +39,8 @@ public class CategoriaServicioImpl implements CategoriaServicio {
                 //TODO Agregar lanzamiento de excepción personalizada.
             } else {
                 categorias.parallelStream().forEach(categoria -> {
-                    categoriaResponseDTOS.add(new CategoriaResponseDTO(categoria.getNombre()));
+                    categoriaResponseDTOS.add(new CategoriaResponseDTO(categoria.getId(),
+                            categoria.getNombre()));
                 });
 
                 return categoriaResponseDTOS;
@@ -61,7 +64,8 @@ public class CategoriaServicioImpl implements CategoriaServicio {
                 //TODO Agregar lanzamiento de excepción personalizada.
                 //return ResponseEntity.notFound().build();
             } else {
-                return new CategoriaResponseDTO(nuevaCategoria.getNombre());
+                return new CategoriaResponseDTO(nuevaCategoria.getId(),
+                        nuevaCategoria.getNombre());
             }
         } catch (Exception e) {
             //TODO Agregar lanzamiento de excepción personalizada.
@@ -72,11 +76,17 @@ public class CategoriaServicioImpl implements CategoriaServicio {
     }
 
     @Override
-    public ResponseEntity<Categoria> eliminarCategoria(Long id) {
+    public ResponseInfoDTO eliminarCategoria(Long id, HttpServletRequest httpServletRequest) {
         try {
             categoriaRepositorio.deleteById(id);
+
+            return new ResponseInfoDTO("Categoria con la Id [" + id + "] eliminada exitosamente",
+                    httpServletRequest.getServletPath(),
+                    HttpStatus.OK.value());
+
         } catch (Exception e) {
-            System.out.println(e);
+            //TODO Agregar lanzamiento de excepción personalizada.
+            //System.out.println(e);
         }
 
         return null;
@@ -91,7 +101,8 @@ public class CategoriaServicioImpl implements CategoriaServicio {
             List<ProductoResponseDTO> productoEnCategoriaResponseDTOS = new ArrayList<>();
 
             productosEnCategoria.parallelStream().forEach(producto -> {
-                productoEnCategoriaResponseDTOS.add(new ProductoResponseDTO(producto.getNombre(),
+                productoEnCategoriaResponseDTOS.add(new ProductoResponseDTO(producto.getId(),
+                        producto.getNombre(),
                         producto.getPrecio(),
                         producto.getCantidad(),
                         producto.getColor()));

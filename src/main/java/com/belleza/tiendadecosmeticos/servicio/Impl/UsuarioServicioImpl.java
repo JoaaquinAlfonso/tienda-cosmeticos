@@ -28,7 +28,8 @@ public class UsuarioServicioImpl implements UsuarioServicio {
                 //TODO Agregar lanzamiento de excepción personalizada.
                 //return ResponseEntity.notFound().build();
             } else {
-                return new UsuarioResponseDTO(nuevoUsuario.getNombre(),
+                return new UsuarioResponseDTO(nuevoUsuario.getId(),
+                        nuevoUsuario.getNombre(),
                         nuevoUsuario.getCedula(),
                         nuevoUsuario.getDireccion());
             }

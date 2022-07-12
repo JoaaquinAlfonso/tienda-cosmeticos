@@ -1,14 +1,15 @@
 package com.belleza.tiendadecosmeticos.controlador;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
-import com.belleza.tiendadecosmeticos.modelo.Categoria;
 import com.belleza.tiendadecosmeticos.servicio.Impl.CategoriaServicioImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -30,8 +31,8 @@ public class CategoriaControlador {
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarCategoria(@PathVariable Long id) {
-        categoriaServicio.eliminarCategoria(id);
+    public ResponseEntity<ResponseInfoDTO> eliminarCategoria(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        return ResponseEntity.ok().body(categoriaServicio.eliminarCategoria(id, httpServletRequest));
     }
 
     @GetMapping("/{id}/productos")

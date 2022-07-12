@@ -1,5 +1,6 @@
 package com.belleza.tiendadecosmeticos.servicio.Impl;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
@@ -8,9 +9,10 @@ import com.belleza.tiendadecosmeticos.repositorio.ProductosCategoriasRepositorio
 import com.belleza.tiendadecosmeticos.repositorio.ProductosRepositorio;
 import com.belleza.tiendadecosmeticos.servicio.ProductoServicio;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,8 @@ public class ProductoServicioImpl implements ProductoServicio {
                 //return ResponseEntity.noContent().build();
             } else {
                 productos.parallelStream().forEach(producto -> {
-                    productoResponseDTOS.add(new ProductoResponseDTO(producto.getNombre(),
+                    productoResponseDTOS.add(new ProductoResponseDTO(producto.getId(),
+                            producto.getNombre(),
                             producto.getPrecio(),
                             producto.getCantidad(),
                             producto.getColor()));
@@ -66,7 +69,8 @@ public class ProductoServicioImpl implements ProductoServicio {
                 productosCategorias.setProducto_id(producto.getId());
                 productosCategoriasRepositorio.save(productosCategorias);
 
-                return new ProductoResponseDTO(nuevoProducto.getNombre(),
+                return new ProductoResponseDTO(nuevoProducto.getId(),
+                        nuevoProducto.getNombre(),
                         nuevoProducto.getPrecio(),
                         nuevoProducto.getCantidad(),
                         nuevoProducto.getColor());
@@ -86,13 +90,18 @@ public class ProductoServicioImpl implements ProductoServicio {
     }
 
     @Override
-    public ResponseEntity<Producto> eliminarProducto(Long id) {
+    public ResponseInfoDTO eliminarProducto(Long id, HttpServletRequest httpServletRequest) {
         try {
             productosCategoriasRepositorio.deleteById(id);
             productosRepositorio.deleteById(id);
+
+            return new ResponseInfoDTO("Producto con la Id [" + id + "] eliminado exitosamente",
+                    httpServletRequest.getServletPath(),
+                    HttpStatus.OK.value());
+
         } catch (Exception e) {
             //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            System.out.println(e);
+            //System.out.println(e);
         }
 
         return null;
@@ -106,7 +115,8 @@ public class ProductoServicioImpl implements ProductoServicio {
                 //TODO Agregar lanzamiento de excepción personalizada o una mejor.
                 //return ResponseEntity.notFound().build();
             } else {
-                return new ProductoResponseDTO(producto.getNombre(),
+                return new ProductoResponseDTO(producto.getId(),
+                        producto.getNombre(),
                         producto.getPrecio(),
                         producto.getCantidad(),
                         producto.getColor());
@@ -130,7 +140,8 @@ public class ProductoServicioImpl implements ProductoServicio {
             productoActual.setCantidad(productoRequestDto.getCantidad());
             productoActual.setColor(productoRequestDto.getColor());
             productosRepositorio.save(productoActual);
-            return new ProductoResponseDTO(productoActual.getNombre(),
+            return new ProductoResponseDTO(productoActual.getId(),
+                    productoActual.getNombre(),
                     productoActual.getPrecio(),
                     productoActual.getCantidad(),
                     productoActual.getColor());
