@@ -1,0 +1,22 @@
+#Nuevo Producto
+http://localhost:8080/api/producto
+{
+    "nombre": "Funciona 12",
+    "precio": 50000,
+    "cantidad": 20,
+    "color": "Rojo",
+    "categoriaId": 1
+}
+#Listar Producto
+http://localhost:8080/api/producto
+#Listar Categorias
+http://localhost:8080/api/categoria
+#Listar Productos Por Categoria
+http://localhost:8080/api/categoria/1/productos
+#Nueva Categoria
+http://localhost:8080/api/categoria
+{
+    "nombre":"Hogar"
+}
+#Eliminar Producto
+http://localhost:8080/api/producto/1

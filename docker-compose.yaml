@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  app:
+    image: 'tiendadecosmeticos:latest'
+    build:
+      context: .
+    container_name: back_spring
+    depends_on:
+      - db
+    environment:
+      - spring.datasource.url=jdbc:postgresql://db:5432/postgres
+      - spring.datasource.username=postgres
+      - spring.datasource.password=JD1077224070
+      - spring.datasource.driver-class-name=org.postgresql.Driver
+      - spring.jpa.hibernate.ddl-auto=update
+      - spring.jpa.show-sql=true
+    ports:
+      - "8080:8080"
+  db:
+    image: 'postgres:14'
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=JD1077224070
