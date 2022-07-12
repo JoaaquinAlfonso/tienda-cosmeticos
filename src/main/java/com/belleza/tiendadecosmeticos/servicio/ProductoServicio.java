@@ -1,6 +1,6 @@
 package com.belleza.tiendadecosmeticos.servicio;
 
-import com.belleza.tiendadecosmeticos.dto.ProductoRequestDTO;
+import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import org.springframework.http.ResponseEntity;

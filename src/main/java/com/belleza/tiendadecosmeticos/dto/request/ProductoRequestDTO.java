@@ -1,4 +1,4 @@
-package com.belleza.tiendadecosmeticos.dto;
+package com.belleza.tiendadecosmeticos.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

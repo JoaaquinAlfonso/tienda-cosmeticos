@@ -1,13 +1,13 @@
 package com.belleza.tiendadecosmeticos.controlador;
 
+import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
+import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
-import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.servicio.Impl.CategoriaServicioImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -19,23 +19,23 @@ public class CategoriaControlador {
     private CategoriaServicioImpl categoriaServicio;
 
     @GetMapping
-    public ResponseEntity<List<Categoria>> listarCategorias(){
-        return categoriaServicio.listarCategorias();
+    public ResponseEntity<List<CategoriaResponseDTO>> listarCategorias() {
+        return ResponseEntity.ok().body(categoriaServicio.listarCategorias());
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> guardarCategoria(@RequestBody Categoria categoria){
-        return categoriaServicio.guardarCategorias(categoria);
+    public ResponseEntity<CategoriaResponseDTO> guardarCategoria(@RequestBody Categoria categoria) {
+        return ResponseEntity.ok().body(categoriaServicio.guardarCategorias(categoria));
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarCategoria(@PathVariable Long id){
+    public void eliminarCategoria(@PathVariable Long id) {
         categoriaServicio.eliminarCategoria(id);
     }
 
     @GetMapping("/{id}/productos")
-    public ResponseEntity<Collection<Producto>> listarProductoPorCategoria(@PathVariable("id") Long id) {
-        return categoriaServicio.listarProductoPorCategoria(id);
+    public ResponseEntity<List<ProductoResponseDTO>> listarProductoPorCategoria(@PathVariable("id") Long id) {
+        return ResponseEntity.ok().body(categoriaServicio.listarProductoPorCategoria(id));
     }
 
 }

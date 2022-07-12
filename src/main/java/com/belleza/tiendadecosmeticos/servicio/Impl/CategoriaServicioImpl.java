@@ -1,5 +1,7 @@
 package com.belleza.tiendadecosmeticos.servicio.Impl;
 
+import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
+import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.repositorio.CategoriaRepositorio;
@@ -9,30 +11,39 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CategoriaServicioImpl implements CategoriaServicio {
 
     /*
-    * Creamos una clase para implementar nuestros metodos antes creados,
-    * le agregamos la etiqueta service y le decimos que este es un implementeacion de
-    * nuestra interfas anterior creada, este nos importara todos los metodos, y aqui es
-    * donde realizamos toda la logica.
-    * */
+     * Creamos una clase para implementar nuestros metodos antes creados,
+     * le agregamos la etiqueta service y le decimos que este es un implementeacion de
+     * nuestra interfas anterior creada, este nos importara todos los metodos, y aqui es
+     * donde realizamos toda la logica.
+     * */
     @Autowired
     private CategoriaRepositorio categoriaRepositorio;
 
     @Override
-    public ResponseEntity<List<Categoria>> listarCategorias() {
+    public List<CategoriaResponseDTO> listarCategorias() {
         try {
             List<Categoria> categorias = categoriaRepositorio.findAll();
-            if (categorias.isEmpty()){
-                return ResponseEntity.noContent().build();
+            List<CategoriaResponseDTO> categoriaResponseDTOS = new ArrayList<>();
+
+            if (categorias.isEmpty()) {
+                //TODO Agregar lanzamiento de excepción personalizada.
+            } else {
+                categorias.parallelStream().forEach(categoria -> {
+                    categoriaResponseDTOS.add(new CategoriaResponseDTO(categoria.getNombre()));
+                });
+
+                return categoriaResponseDTOS;
             }
-            return ResponseEntity.ok(categorias);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -40,16 +51,18 @@ public class CategoriaServicioImpl implements CategoriaServicio {
     }
 
     @Override
-    public ResponseEntity<Categoria> guardarCategorias(Categoria categoria) {
+    public CategoriaResponseDTO guardarCategorias(Categoria categoria) {
         try {
-            Categoria nuevaCatgoria = categoriaRepositorio.save(categoria);
-            if (nuevaCatgoria == null){
-                return ResponseEntity.notFound().build();
-            }else{
-                return ResponseEntity.ok(categoria);
+            Categoria nuevaCategoria = categoriaRepositorio.save(categoria);
+            if (nuevaCategoria == null) {
+                //TODO Agregar lanzamiento de excepción personalizada.
+                //return ResponseEntity.notFound().build();
+            } else {
+                return new CategoriaResponseDTO(nuevaCategoria.getNombre());
             }
-        }catch (Exception e){
-            System.out.println(e);
+        } catch (Exception e) {
+            //TODO Agregar lanzamiento de excepción personalizada.
+            //System.out.println(e);
         }
 
         return null;
@@ -59,7 +72,7 @@ public class CategoriaServicioImpl implements CategoriaServicio {
     public ResponseEntity<Categoria> eliminarCategoria(Long id) {
         try {
             categoriaRepositorio.deleteById(id);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -67,14 +80,26 @@ public class CategoriaServicioImpl implements CategoriaServicio {
     }
 
     @Override
-    public ResponseEntity<Collection<Producto>> listarProductoPorCategoria(Long id) {
+    public List<ProductoResponseDTO> listarProductoPorCategoria(Long id) {
         Categoria categoria = categoriaRepositorio.findById(id).orElseThrow();
 
-        if (categoria != null){
-            return new ResponseEntity<>(categoria.getProductos(), HttpStatus.OK);
-        }else {
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-        }
+        if (categoria != null) {
+            Set<Producto> productosEnCategoria = categoria.getProductos();
+            List<ProductoResponseDTO> productoEnCategoriaResponseDTOS = new ArrayList<>();
 
+            productosEnCategoria.parallelStream().forEach(producto -> {
+                productoEnCategoriaResponseDTOS.add(new ProductoResponseDTO(producto.getNombre(),
+                        producto.getPrecio(),
+                        producto.getCantidad(),
+                        producto.getColor()));
+            });
+
+            return productoEnCategoriaResponseDTOS;
+        } else {
+            //TODO Agregar lanzamiento de excepción personalizada.
+
+            //return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return null;
     }
 }

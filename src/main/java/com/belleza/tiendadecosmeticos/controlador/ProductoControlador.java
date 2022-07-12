@@ -1,8 +1,7 @@
 package com.belleza.tiendadecosmeticos.controlador;
 
-import com.belleza.tiendadecosmeticos.dto.ProductoRequestDTO;
+import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
-import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.servicio.Impl.ProductoServicioImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
