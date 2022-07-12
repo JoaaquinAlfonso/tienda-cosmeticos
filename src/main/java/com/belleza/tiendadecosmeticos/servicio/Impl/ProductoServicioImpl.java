@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,14 +24,26 @@ public class ProductoServicioImpl implements ProductoServicio {
     private ProductosCategoriasRepositorio productosCategoriasRepositorio;
 
     @Override
-    public ResponseEntity<List<Producto>> listarProductos() {
+    public List<ProductoResponseDTO> listarProductos() {
         try {
             List<Producto> productos = productosRepositorio.findAll();
+            List<ProductoResponseDTO> productoResponseDTOS = new ArrayList<>();
+
             if (productos.isEmpty()) {
-                return ResponseEntity.noContent().build();
+                //TODO Hacer que retorne una excepción de lista vacía
+                //return ResponseEntity.noContent().build();
+            } else {
+                productos.parallelStream().forEach(producto -> {
+                    productoResponseDTOS.add(new ProductoResponseDTO(producto.getNombre(),
+                            producto.getPrecio(),
+                            producto.getCantidad(),
+                            producto.getColor()));
+                });
+
+                return productoResponseDTOS;
             }
-            return ResponseEntity.ok(productos);
         } catch (Exception e) {
+            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
             System.out.println("ERROR" + e);
         }
 
@@ -38,7 +51,7 @@ public class ProductoServicioImpl implements ProductoServicio {
     }
 
     @Override
-    public ResponseEntity<ProductoRequestDTO> guardarProducto(ProductoRequestDTO productoRequestDto) {
+    public ProductoResponseDTO guardarProducto(ProductoRequestDTO productoRequestDto) {
         try {
             if (productoRequestDto != null) {
                 Producto producto = new Producto();
@@ -51,14 +64,20 @@ public class ProductoServicioImpl implements ProductoServicio {
                 ProductosCategorias productosCategorias = new ProductosCategorias();
                 productosCategorias.setCategoria_id(productoRequestDto.getCategoriaId());
                 productosCategorias.setProducto_id(producto.getId());
-                ProductosCategorias nuevaRelacion = productosCategoriasRepositorio.save(productosCategorias);
+                productosCategoriasRepositorio.save(productosCategorias);
 
-                return ResponseEntity.ok(productoRequestDto);
+                return new ProductoResponseDTO(nuevoProducto.getNombre(),
+                        nuevoProducto.getPrecio(),
+                        nuevoProducto.getCantidad(),
+                        nuevoProducto.getColor());
 
             } else {
-                return ResponseEntity.notFound().build();
+                //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+
+                //return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
+            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
             System.out.println(e);
         }
 
@@ -72,6 +91,7 @@ public class ProductoServicioImpl implements ProductoServicio {
             productosCategoriasRepositorio.deleteById(id);
             productosRepositorio.deleteById(id);
         } catch (Exception e) {
+            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
             System.out.println(e);
         }
 
@@ -79,15 +99,22 @@ public class ProductoServicioImpl implements ProductoServicio {
     }
 
     @Override
-    public ResponseEntity<Producto> productoPorId(Long id) {
+    public ProductoResponseDTO productoPorId(Long id) {
         try {
             Producto producto = productosRepositorio.findById(id).orElse(null);
             if (producto == null) {
-                return ResponseEntity.notFound().build();
+                //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+                //return ResponseEntity.notFound().build();
+            } else {
+                return new ProductoResponseDTO(producto.getNombre(),
+                        producto.getPrecio(),
+                        producto.getCantidad(),
+                        producto.getColor());
             }
-            return ResponseEntity.ok(producto);
+
         } catch (Exception e) {
-            System.out.println(e);
+            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+            //System.out.println(e);
         }
 
         return null;

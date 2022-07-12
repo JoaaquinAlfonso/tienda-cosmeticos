@@ -19,18 +19,18 @@ public class ProductoControlador {
     private ProductoServicioImpl productoServicio;
 
     @GetMapping
-    public ResponseEntity<List<Producto>> listarProductos() {
-        return productoServicio.listarProductos();
+    public ResponseEntity<List<ProductoResponseDTO>> listarProductos() {
+        return ResponseEntity.ok().body(productoServicio.listarProductos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
-        return productoServicio.productoPorId(id);
+    public ResponseEntity<ProductoResponseDTO> obtenerProducto(@PathVariable Long id) {
+        return ResponseEntity.ok().body(productoServicio.productoPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProductoRequestDTO> guardarProductos(@RequestBody ProductoRequestDTO productoRequestDto) {
-        return productoServicio.guardarProducto(productoRequestDto);
+    public ResponseEntity<ProductoResponseDTO> guardarProductos(@RequestBody ProductoRequestDTO productoRequestDto) {
+        return ResponseEntity.ok().body(productoServicio.guardarProducto(productoRequestDto));
     }
 
     @PutMapping("/{id}")

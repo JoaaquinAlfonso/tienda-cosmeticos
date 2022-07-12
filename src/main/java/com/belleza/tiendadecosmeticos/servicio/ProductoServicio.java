@@ -8,13 +8,13 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ProductoServicio {
-    ResponseEntity<List<Producto>> listarProductos();
+    List<ProductoResponseDTO> listarProductos();
 
-    ResponseEntity<ProductoRequestDTO> guardarProducto(ProductoRequestDTO productoRequestDto);
+    ProductoResponseDTO guardarProducto(ProductoRequestDTO productoRequestDto);
 
     ResponseEntity<Producto> eliminarProducto(Long id);
 
-    ResponseEntity<Producto> productoPorId(Long id);
+    ProductoResponseDTO productoPorId(Long id);
 
     ProductoResponseDTO actualizarProducto(ProductoRequestDTO productoRequestDto, Long id);
 
