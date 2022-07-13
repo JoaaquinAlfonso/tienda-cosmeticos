@@ -3,6 +3,7 @@ package com.belleza.tiendadecosmeticos.servicio.Impl;
 import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.UsuarioRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.UsuarioResponseDTO;
+import com.belleza.tiendadecosmeticos.exceptions.DataBaseException;
 import com.belleza.tiendadecosmeticos.modelo.Usuario;
 import com.belleza.tiendadecosmeticos.repositorio.UsuarioRepositirio;
 import com.belleza.tiendadecosmeticos.servicio.UsuarioServicio;
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,29 +25,23 @@ public class UsuarioServicioImpl implements UsuarioServicio {
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioRequestDTO usuarioRequestDTO) {
-        try {
-            Usuario usuarioPorCrear = new Usuario();
-            usuarioPorCrear.setCedula(usuarioRequestDTO.getCedula());
-            usuarioPorCrear.setDireccion(usuarioRequestDTO.getDireccion());
-            usuarioPorCrear.setNombre(usuarioRequestDTO.getNombre());
 
-            Usuario nuevoUsuario = usuarioRepositorio.save(usuarioPorCrear);
+        Usuario usuarioPorCrear = new Usuario();
+        usuarioPorCrear.setCedula(usuarioRequestDTO.getCedula());
+        usuarioPorCrear.setDireccion(usuarioRequestDTO.getDireccion());
+        usuarioPorCrear.setNombre(usuarioRequestDTO.getNombre());
 
-            if (nuevoUsuario == null) {
-                //TODO Agregar lanzamiento de excepción personalizada.
-                //return ResponseEntity.notFound().build();
-            } else {
-                return new UsuarioResponseDTO(nuevoUsuario.getId(),
-                        nuevoUsuario.getNombre(),
-                        nuevoUsuario.getCedula(),
-                        nuevoUsuario.getDireccion());
-            }
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada.
-            //System.out.println(e);
+        Usuario nuevoUsuario = usuarioRepositorio.save(usuarioPorCrear);
+
+        if (nuevoUsuario == null) {
+            throw new DataBaseException("Hubo un error interno al guardar el usuario [" + usuarioRequestDTO.getNombre() + "], intente nuevamente");
+        } else {
+            return new UsuarioResponseDTO(nuevoUsuario.getId(),
+                    nuevoUsuario.getNombre(),
+                    nuevoUsuario.getCedula(),
+                    nuevoUsuario.getDireccion());
         }
 
-        return null;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
         List<UsuarioResponseDTO> usuarioResponseDTOList = new ArrayList<>();
 
         if (usuarios.isEmpty()) {
-            //TODO Hacer que retorne una excepción de lista vacía
+            return Collections.emptyList();
         } else {
             usuarios.parallelStream().forEach(usuario -> {
                 usuarioResponseDTOList.add(new UsuarioResponseDTO(usuario.getId(),
@@ -65,45 +62,36 @@ public class UsuarioServicioImpl implements UsuarioServicio {
             return usuarioResponseDTOList;
         }
 
-        return null;
     }
 
     @Override
     public UsuarioResponseDTO listarUnUsuarioPorId(Long id) {
-        try {
-            Usuario usuario = usuarioRepositorio.findById(id).orElse(null);
 
-            if (usuario == null) {
-                //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+        Usuario usuario = usuarioRepositorio.findById(id).orElse(null);
 
-            } else {
-                return new UsuarioResponseDTO(usuario.getId(),
-                        usuario.getNombre(),
-                        usuario.getCedula(),
-                        usuario.getDireccion());
-            }
+        if (usuario == null) {
+            throw new EntityNotFoundException("El usuario con la ID [" + id + "] no se encuentra en la base de datos");
 
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+        } else {
+            return new UsuarioResponseDTO(usuario.getId(),
+                    usuario.getNombre(),
+                    usuario.getCedula(),
+                    usuario.getDireccion());
         }
 
-        return null;
     }
 
     @Override
     public ResponseInfoDTO eliminarUsuario(Long id, HttpServletRequest httpServletRequest) {
-        try {
-            usuarioRepositorio.deleteById(id);
-
+        usuarioRepositorio.deleteById(id);
+        if (usuarioRepositorio.findById(id).orElse(null) == null) {
             return new ResponseInfoDTO("Usuario con la Id [" + id + "] eliminado exitosamente",
                     httpServletRequest.getServletPath(),
                     HttpStatus.OK.value());
+        } else {
+            throw new DataBaseException("Hubo un error interno al borrar el usuario con ID [" + id + "], intente nuevamente");
 
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            //System.out.println(e);
         }
 
-        return null;
     }
 }

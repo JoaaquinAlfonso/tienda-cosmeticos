@@ -3,6 +3,7 @@ package com.belleza.tiendadecosmeticos.servicio.Impl;
 import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
+import com.belleza.tiendadecosmeticos.exceptions.DataBaseException;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.modelo.ProductosCategorias;
 import com.belleza.tiendadecosmeticos.repositorio.ProductosCategoriasRepositorio;
@@ -12,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -27,113 +30,90 @@ public class ProductoServicioImpl implements ProductoServicio {
 
     @Override
     public List<ProductoResponseDTO> listarProductos() {
-        try {
-            List<Producto> productos = productosRepositorio.findAll();
-            List<ProductoResponseDTO> productoResponseDTOS = new ArrayList<>();
+        List<Producto> productos = productosRepositorio.findAll();
+        List<ProductoResponseDTO> productoResponseDTOS = new ArrayList<>();
 
-            if (productos.isEmpty()) {
-                //TODO Hacer que retorne una excepción de lista vacía
-                //return ResponseEntity.noContent().build();
-            } else {
-                productos.parallelStream().forEach(producto -> {
-                    productoResponseDTOS.add(new ProductoResponseDTO(producto.getId(),
-                            producto.getNombre(),
-                            producto.getPrecio(),
-                            producto.getCantidad(),
-                            producto.getColor()));
-                });
+        if (productos.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            productos.parallelStream().forEach(producto -> {
+                productoResponseDTOS.add(new ProductoResponseDTO(producto.getId(),
+                        producto.getNombre(),
+                        producto.getPrecio(),
+                        producto.getCantidad(),
+                        producto.getColor()));
+            });
 
-                return productoResponseDTOS;
-            }
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            System.out.println("ERROR" + e);
+            return productoResponseDTOS;
         }
 
-        return null;
     }
 
     @Override
     public ProductoResponseDTO guardarProducto(ProductoRequestDTO productoRequestDto) {
-        try {
-            if (productoRequestDto != null) {
-                Producto producto = new Producto();
-                producto.setNombre(productoRequestDto.getNombre());
-                producto.setPrecio(productoRequestDto.getPrecio());
-                producto.setCantidad(productoRequestDto.getCantidad());
-                producto.setColor(productoRequestDto.getColor());
-                Producto nuevoProducto = productosRepositorio.save(producto);
 
-                ProductosCategorias productosCategorias = new ProductosCategorias();
-                productosCategorias.setCategoria_id(productoRequestDto.getCategoriaId());
-                productosCategorias.setProducto_id(producto.getId());
-                productosCategoriasRepositorio.save(productosCategorias);
 
-                return new ProductoResponseDTO(nuevoProducto.getId(),
-                        nuevoProducto.getNombre(),
-                        nuevoProducto.getPrecio(),
-                        nuevoProducto.getCantidad(),
-                        nuevoProducto.getColor());
+        Producto producto = new Producto();
+        producto.setNombre(productoRequestDto.getNombre());
+        producto.setPrecio(productoRequestDto.getPrecio());
+        producto.setCantidad(productoRequestDto.getCantidad());
+        producto.setColor(productoRequestDto.getColor());
+        Producto nuevoProducto = productosRepositorio.save(producto);
 
-            } else {
-                //TODO Agregar lanzamiento de excepción personalizada o una mejor.
+        ProductosCategorias productosCategorias = new ProductosCategorias();
+        productosCategorias.setCategoria_id(productoRequestDto.getCategoriaId());
+        productosCategorias.setProducto_id(producto.getId());
+        productosCategoriasRepositorio.save(productosCategorias);
 
-                //return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            System.out.println(e);
+        if (nuevoProducto != null) {
+            return new ProductoResponseDTO(nuevoProducto.getId(),
+                    nuevoProducto.getNombre(),
+                    nuevoProducto.getPrecio(),
+                    nuevoProducto.getCantidad(),
+                    nuevoProducto.getColor());
+        } else {
+            throw new DataBaseException("Hubo un error interno al guardar el producto [" + productoRequestDto.getNombre() + "], intente nuevamente");
         }
-
-        return null;
-
     }
 
     @Override
     public ResponseInfoDTO eliminarProducto(Long id, HttpServletRequest httpServletRequest) {
-        try {
-            productosCategoriasRepositorio.deleteById(id);
-            productosRepositorio.deleteById(id);
 
+        productosCategoriasRepositorio.deleteById(id);//TODO Arreglar esto. El ID de la tabla intermedia no es el mismo ID que el del producto en sí
+        productosRepositorio.deleteById(id);
+
+        if (productosRepositorio.findById(id).orElse(null) == null) {
             return new ResponseInfoDTO("Producto con la Id [" + id + "] eliminado exitosamente",
                     httpServletRequest.getServletPath(),
                     HttpStatus.OK.value());
-
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            //System.out.println(e);
+        } else {
+            throw new DataBaseException("Hubo un error interno al borrar el producto con ID ["+ id +"], intente nuevamente");
         }
 
-        return null;
     }
 
     @Override
     public ProductoResponseDTO productoPorId(Long id) {
-        try {
-            Producto producto = productosRepositorio.findById(id).orElse(null);
-            if (producto == null) {
-                //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-                //return ResponseEntity.notFound().build();
-            } else {
-                return new ProductoResponseDTO(producto.getId(),
-                        producto.getNombre(),
-                        producto.getPrecio(),
-                        producto.getCantidad(),
-                        producto.getColor());
-            }
 
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            //System.out.println(e);
+        Producto producto = productosRepositorio.findById(id).orElse(null);
+
+        if (producto == null) {
+            throw new EntityNotFoundException("El producto con la ID [" + id + "] no se encuentra en la base de datos");
+        } else {
+            return new ProductoResponseDTO(producto.getId(),
+                    producto.getNombre(),
+                    producto.getPrecio(),
+                    producto.getCantidad(),
+                    producto.getColor());
         }
-
-        return null;
     }
 
     @Override
     public ProductoResponseDTO actualizarProducto(ProductoRequestDTO productoRequestDto, Long id) {
-        try {
-            Producto productoActual = productosRepositorio.findById(id).orElseThrow();
+
+        Producto productoActual = productosRepositorio.findById(id).orElse(null);
+
+        if (productoActual != null) {
             productoActual.setId(id);
             productoActual.setNombre(productoRequestDto.getNombre());
             productoActual.setPrecio(productoRequestDto.getPrecio());
@@ -146,10 +126,9 @@ public class ProductoServicioImpl implements ProductoServicio {
                     productoActual.getCantidad(),
                     productoActual.getColor());
 
-        } catch (Exception exception) {
-            throw exception;
-            //TODO Agregar lanzamiento de excepción personalizada o una mejor.
-            //return new ResponseEntity<Producto>(HttpStatus.NOT_FOUND);
+        } else {
+            throw new EntityNotFoundException("El producto con la ID [" + id + "] no se encuentra en la base de datos");
         }
+
     }
 }

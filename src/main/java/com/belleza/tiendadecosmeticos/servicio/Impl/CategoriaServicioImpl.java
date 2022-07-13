@@ -4,6 +4,7 @@ import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
+import com.belleza.tiendadecosmeticos.exceptions.DataBaseException;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import com.belleza.tiendadecosmeticos.repositorio.CategoriaRepositorio;
@@ -12,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -31,70 +34,58 @@ public class CategoriaServicioImpl implements CategoriaServicio {
 
     @Override
     public List<CategoriaResponseDTO> listarCategorias() {
-        try {
-            List<Categoria> categorias = categoriaRepositorio.findAll();
-            List<CategoriaResponseDTO> categoriaResponseDTOS = new ArrayList<>();
 
-            if (categorias.isEmpty()) {
-                //TODO Agregar lanzamiento de excepción personalizada.
-            } else {
-                categorias.parallelStream().forEach(categoria -> {
-                    categoriaResponseDTOS.add(new CategoriaResponseDTO(categoria.getId(),
-                            categoria.getNombre()));
-                });
+        List<Categoria> categorias = categoriaRepositorio.findAll();
+        List<CategoriaResponseDTO> categoriaResponseDTOS = new ArrayList<>();
 
-                return categoriaResponseDTOS;
-            }
-        } catch (Exception e) {
-            System.out.println(e);
+        if (categorias.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            categorias.parallelStream().forEach(categoria -> {
+                categoriaResponseDTOS.add(new CategoriaResponseDTO(categoria.getId(),
+                        categoria.getNombre()));
+            });
+
+            return categoriaResponseDTOS;
         }
 
-        return null;
     }
 
     @Override
     public CategoriaResponseDTO guardarCategorias(CategoriaRequestDTO categoriaRequestDTO) {
-        try {
-            Categoria categoriaPorCrear = new Categoria();
-            categoriaPorCrear.setNombre(categoriaRequestDTO.getNombre());
 
-            Categoria nuevaCategoria = categoriaRepositorio.save(categoriaPorCrear);
+        Categoria categoriaPorCrear = new Categoria();
+        categoriaPorCrear.setNombre(categoriaRequestDTO.getNombre());
 
-            if (nuevaCategoria == null) {
-                //TODO Agregar lanzamiento de excepción personalizada.
-                //return ResponseEntity.notFound().build();
-            } else {
-                return new CategoriaResponseDTO(nuevaCategoria.getId(),
-                        nuevaCategoria.getNombre());
-            }
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada.
-            //System.out.println(e);
+        Categoria nuevaCategoria = categoriaRepositorio.save(categoriaPorCrear);
+
+        if (nuevaCategoria == null) {
+            throw new DataBaseException("Hubo un error interno al guardar la categoría [" + categoriaRequestDTO.getNombre() + "], intente nuevamente");
+        } else {
+            return new CategoriaResponseDTO(nuevaCategoria.getId(),
+                    nuevaCategoria.getNombre());
         }
 
-        return null;
     }
 
     @Override
     public ResponseInfoDTO eliminarCategoria(Long id, HttpServletRequest httpServletRequest) {
-        try {
-            categoriaRepositorio.deleteById(id);
+        categoriaRepositorio.deleteById(id);
 
+        if (categoriaRepositorio.findById(id).orElse(null) == null) {
             return new ResponseInfoDTO("Categoria con la Id [" + id + "] eliminada exitosamente",
                     httpServletRequest.getServletPath(),
                     HttpStatus.OK.value());
 
-        } catch (Exception e) {
-            //TODO Agregar lanzamiento de excepción personalizada.
-            //System.out.println(e);
+        } else {
+            throw new DataBaseException("Hubo un error interno al borrar la categoría con ID ["+ id +"], intente nuevamente");
         }
 
-        return null;
     }
 
     @Override
     public List<ProductoResponseDTO> listarProductoPorCategoria(Long id) {
-        Categoria categoria = categoriaRepositorio.findById(id).orElseThrow();
+        Categoria categoria = categoriaRepositorio.findById(id).orElse(null);
 
         if (categoria != null) {
             Set<Producto> productosEnCategoria = categoria.getProductos();
@@ -110,10 +101,7 @@ public class CategoriaServicioImpl implements CategoriaServicio {
 
             return productoEnCategoriaResponseDTOS;
         } else {
-            //TODO Agregar lanzamiento de excepción personalizada.
-
-            //return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new EntityNotFoundException("La categoría con la ID [" + id + "] no se encuentra en la base de datos");
         }
-        return null;
     }
 }
