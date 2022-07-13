@@ -1,10 +1,13 @@
 package com.belleza.tiendadecosmeticos.servicio;
 
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
+import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
+import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
+import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Categoria;
-import com.belleza.tiendadecosmeticos.modelo.Producto;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Collection;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface CategoriaServicio {
@@ -12,12 +15,12 @@ public interface CategoriaServicio {
     /*
      * Creacion de metodos a utilizar, en esta interface no va la logica.
      */
-    ResponseEntity<List<Categoria>> listarCategorias();
+    List<CategoriaResponseDTO> listarCategorias();
 
-    ResponseEntity<Categoria>  guardarCategorias(Categoria categoria);
+    CategoriaResponseDTO guardarCategorias(CategoriaRequestDTO categoriaRequestDTO);
 
-    ResponseEntity<Categoria> eliminarCategoria(Long id);
+    ResponseInfoDTO eliminarCategoria(Long id, HttpServletRequest httpServletRequest);
 
-    ResponseEntity<Collection<Producto>> listarProductoPorCategoria(Long id);
+    List<ProductoResponseDTO> listarProductoPorCategoria(Long id);
 
 }

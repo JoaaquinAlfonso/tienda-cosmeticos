@@ -1,20 +1,23 @@
 package com.belleza.tiendadecosmeticos.servicio;
 
-import com.belleza.tiendadecosmeticos.dto.ProductoDto;
+import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
+import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
+import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.modelo.Producto;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface ProductoServicio {
-     ResponseEntity<List<Producto>> listarProductos();
+    List<ProductoResponseDTO> listarProductos();
 
-     ResponseEntity<ProductoDto> guardarProducto(ProductoDto productoDto);
+    ProductoResponseDTO guardarProducto(ProductoRequestDTO productoRequestDto);
 
-     ResponseEntity<Producto> eliminarProducto(Long id);
+    ResponseInfoDTO eliminarProducto(Long id, HttpServletRequest httpServletRequest);
 
-     ResponseEntity<Producto> productoPorId(Long id);
+    ProductoResponseDTO productoPorId(Long id);
 
-     ResponseEntity<Producto> actualizarProducto(Producto producto,Long id);
+    ProductoResponseDTO actualizarProducto(ProductoRequestDTO productoRequestDto, Long id);
 
 }
