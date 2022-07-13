@@ -1,4 +1,4 @@
-package com.belleza.tiendadecosmeticos.dto;
+package com.belleza.tiendadecosmeticos.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductoDto {
+public class ProductoRequestDTO {
 
     /*
     * Un Dto, muy practicos para filtrar o evitar que informacion sensible
