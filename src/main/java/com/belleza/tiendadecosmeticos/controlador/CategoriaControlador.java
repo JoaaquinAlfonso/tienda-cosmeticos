@@ -5,11 +5,14 @@ import com.belleza.tiendadecosmeticos.dto.request.CategoriaRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.CategoriaResponseDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.servicio.Impl.CategoriaServicioImpl;
+import com.belleza.tiendadecosmeticos.util.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -26,7 +29,8 @@ public class CategoriaControlador {
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaResponseDTO> guardarCategoria(@RequestBody CategoriaRequestDTO categoriaRequestDTO) {
+    public ResponseEntity<CategoriaResponseDTO> guardarCategoria(@Valid @RequestBody CategoriaRequestDTO categoriaRequestDTO, BindingResult bindingResult) {
+        Validation.validarParametros(bindingResult);
         return ResponseEntity.ok().body(categoriaServicio.guardarCategorias(categoriaRequestDTO));
     }
 

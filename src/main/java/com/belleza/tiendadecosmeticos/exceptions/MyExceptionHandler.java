@@ -35,5 +35,12 @@ public class MyExceptionHandler {
                 HttpStatus.NOT_FOUND.value()));
     }
 
+    @ExceptionHandler({RequestBodyException.class})
+    public ResponseEntity<ResponseInfoDTO> requestBodyException(RequestBodyException requestBodyException, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseInfoDTO(requestBodyException.getMessage(),
+                request.getServletPath(),
+                HttpStatus.BAD_REQUEST.value()));
+    }
+
 
 }

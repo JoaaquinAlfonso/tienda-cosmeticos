@@ -4,11 +4,14 @@ import com.belleza.tiendadecosmeticos.dto.ResponseInfoDTO;
 import com.belleza.tiendadecosmeticos.dto.request.ProductoRequestDTO;
 import com.belleza.tiendadecosmeticos.dto.response.ProductoResponseDTO;
 import com.belleza.tiendadecosmeticos.servicio.Impl.ProductoServicioImpl;
+import com.belleza.tiendadecosmeticos.util.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -30,12 +33,14 @@ public class ProductoControlador {
     }
 
     @PostMapping
-    public ResponseEntity<ProductoResponseDTO> guardarProductos(@RequestBody ProductoRequestDTO productoRequestDto) {
+    public ResponseEntity<ProductoResponseDTO> guardarProductos(@Valid @RequestBody ProductoRequestDTO productoRequestDto, BindingResult bindingResult) {
+        Validation.validarParametros(bindingResult);
         return ResponseEntity.ok().body(productoServicio.guardarProducto(productoRequestDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> actualizarProducto(@RequestBody ProductoRequestDTO productoRequestDto, @PathVariable Long id) {
+    public ResponseEntity<ProductoResponseDTO> actualizarProducto(@Valid @RequestBody ProductoRequestDTO productoRequestDto, BindingResult bindingResult, @PathVariable Long id) {
+        Validation.validarParametros(bindingResult); //TODO Testear este, no te olvides
         return ResponseEntity.ok().body(productoServicio.actualizarProducto(productoRequestDto, id));
     }
 
